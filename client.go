@@ -160,7 +160,8 @@ func (c *Client) Stat(path string) (os.FileInfo, error) {
 
 	// Check if the path is a file
 	secret, err := c.Logical().Read(strings.TrimLeft(path, "/"))
-	if err != nil {
+	// read on a dir might give a permission error, so ignore it.
+	if err != nil && !isPermissionDenied(err) {
 		return nil, err
 	}
 	if secret != nil {
